@@ -3,8 +3,8 @@
 
 #First part checks to make sure we have a host or any variable given.  If not, help options are displayed
 if [ -z "$1" ]; then
-echo "[*] SMB Nmap NSE Scanner"
-echo "[*] Usage: wsmb <target> [options]"
+echo "[*] Nmap Full Vuln Scan"
+echo "[*] Usage: wenum <target> [options]"
 echo "options:"
 echo "-h, --help                    Show Brief Help"
 echo "-l                            Search for NSE Vuln Scripts"
@@ -28,8 +28,8 @@ fi
 #Here we set up our options and arguments
 for arg; do
     case $arg in
-        -h) echo "[*] SMB Nmap NSE Scanner"
-            echo "[*] Usage: wsmb <domain name> -options"
+        -h) echo "[*] Nmap Full Vuln Scan"
+            echo "[*] Usage: wenum <domain name> -options"
             echo "options:"
             echo "-h, --help                    show brief help"
             echo "-l                            Search for NSE Vuln Scripts"
@@ -134,8 +134,8 @@ for arg; do
             nmap -p$PORT -script $SCRIPT $1 --open
             fi 
             exit 0;;
-        -*) echo "[*] SMB Nmap NSE Scanner"
-            echo "[*] Usage: wsmb <domain name> -options"
+        -*) echo "[*] Nmap Full Vuln Scan"
+            echo "[*] Usage: wenum <domain name> -options"
             echo "options:"
             echo "-h, --help                    show brief help"
             echo "-l                            Search for NSE Vuln Scripts"
