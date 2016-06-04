@@ -1,8 +1,8 @@
 Simply chmod +x and place in a directory in your path
 <br />
-[*] Nmap Full Vuln Scan
+\[\*\] Nmap Full Vuln Scan
 <br />
-[*] Usage: wenum <target> [options]
+\[\*\] Usage: wenum <target> [options]
 <br />
 options:
 <br />
