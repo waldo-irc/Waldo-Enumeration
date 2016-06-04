@@ -1,4 +1,5 @@
-Simply chmod +x and place in a directory in your path
+<strong>Simply chmod +x and place in a directory in your path</strong>
+
 <br />
 \[\*\] Nmap Full Vuln Scan
 <br />
