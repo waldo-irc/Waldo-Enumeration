@@ -11,6 +11,7 @@ echo "-l                            Search for NSE Vuln Scripts"
 echo "-la                           Search through all NSE Scripts"
 echo "-hv                           Run all HTTP Vuln NSE's against target"
 echo "-s                            Run the Full Powerhouse Suite"
+echo "-cs                           Run NSE Script against Target"
 echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
 echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"
 exit 0
@@ -35,6 +36,7 @@ for arg; do
             echo "-la                           Search through all NSE Scripts"
             echo "-hv                           Run all HTTP Vuln NSE's against target"
             echo "-s                            Run the Full Powerhouse Suite"
+            echo "-cs                           Run NSE Script against Target"
             echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
             echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"                
             exit 0 ;;
@@ -123,6 +125,15 @@ for arg; do
             done 
             echo "[*] Done!  Check ~/Desktop/$host-enum/NSE for Scans"
             exit 0 ;;
+        -cs) if [ "$1" == "-cs" ]; then
+            echo "[*] Executes any NSE Scripts"
+            echo "[*] Ex:wenum 192.222.4.23 -cs"
+            else
+            read -p "<Which Script?> :`echo $'\n> '`" SCRIPT;
+            read -p "<Which Port(s)?> :`echo $'\n> '`" PORT;
+            nmap -p$PORT -script $SCRIPT $1 --open
+            fi 
+            exit 0;;
         -*) echo "[*] SMB Nmap NSE Scanner"
             echo "[*] Usage: wsmb <domain name> -options"
             echo "options:"
@@ -131,6 +142,7 @@ for arg; do
             echo "-la                           Search through all NSE Scripts"
             echo "-hv                           Run all HTTP Vuln NSE's against target"
             echo "-s                            Run the Full Powerhouse Suite"
+            echo "-cs                           Run NSE Script against Target"
             echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
             echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"  
             exit 0;;
