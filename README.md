@@ -21,5 +21,3 @@ options:
 -stryngs                      Run the stryngs Verb Tampering Special :D
 <br />
 -stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>
-<br />
-exit 0
