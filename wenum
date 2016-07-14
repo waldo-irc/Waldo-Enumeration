@@ -29,7 +29,7 @@ fi
 for arg; do
     case $arg in
         -h) echo "[*] Nmap Full Vuln Scan"
-            echo "[*] Usage: wenum <domain name> -options"
+            echo "[*] Usage: wenum <target> -options"
             echo "options:"
             echo "-h, --help                    show brief help"
             echo "-l                            Search for NSE Vuln Scripts"
@@ -115,8 +115,9 @@ for arg; do
                  mkdir ~/Desktop/$host-enum
                  mkdir ~/Desktop/$host-enum/NSE
             fi 
+            read -p "<What Port?>: " port;
             for a in $(locate nmap/scripts/http | cut -d"/" -f6 | grep "vuln" | cut -d"." -f1 | sort -r ); do
-                 nmap -p80 -script $a $1 --open > ~/Desktop/$host-enum/NSE/$a.txt
+                 nmap -p$port -script $a $1 --open > ~/Desktop/$host-enum/NSE/$a.txt
                  wait
                  echo "[*] Running $a"
                  if grep -q "VULNERABLE" ~/Desktop/$host-enum/NSE/$a.txt; then
@@ -135,7 +136,7 @@ for arg; do
             fi 
             exit 0;;
         -*) echo "[*] Nmap Full Vuln Scan"
-            echo "[*] Usage: wenum <domain name> -options"
+            echo "[*] Usage: wenum <target> -options"
             echo "options:"
             echo "-h, --help                    show brief help"
             echo "-l                            Search for NSE Vuln Scripts"
