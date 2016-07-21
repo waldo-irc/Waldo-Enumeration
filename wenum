@@ -20,7 +20,17 @@ echo "--update                      Updates wenum"
 exit 0
 fi
 
+ABSOLUTE_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")
 VERSION=1.0.2
+
+if grep -q "WUPDATE=1" ~/.bashrc; then
+     :
+else
+     echo "[*] Updating Database"
+     updatedb     
+     echo "WUPDATE=1" >> ~/.bashrc
+fi
+
 #store our final octet for final naming into $host
 if [[ $1 == *[/]* ]]; then
      hostl=$(echo $1 | cut -d"." -f4 | cut -d"/" -f2)
@@ -211,7 +221,6 @@ for arg; do
                  git=$(curl --silent https://github.com/barthyala/waldo-enumeration/blob/master/wenum | grep 'VERSION=' | cut -d">" -f2 | cut -d"<" -f1 | cut -d"=" -f 2)
                  echo "$git Git Version"
                  echo "$VERSION Installed Version"
-                 ABSOLUTE_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")
                  #Uncomment below for debugging
                  #echo "$ABSOLUTE_PATH"
                  if [ "$git" == "$VERSION" ]; then
