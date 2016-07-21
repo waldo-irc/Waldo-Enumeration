@@ -21,6 +21,7 @@ echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"
 exit 0
 fi
 
+VERSION=1.0.1
 #store our final octet for final naming into $host
 if [[ $1 == *[/]* ]]; then
 hostl=$(echo $1 | cut -d"." -f4 | cut -d"/" -f2)
@@ -156,31 +157,57 @@ for arg; do
             fi 
             exit 0;;
         -b) if [ "$1" == "-b" ]; then
-            echo "[*] Runs Brush on Hostname(Installs if not already-requires pip and git)"
-            echo "[*] Ex:wenum google.com -b"
+                 echo "[*] Runs Brush on Hostname(Installs if not already-requires pip and git)"
+                 echo "[*] Ex:wenum google.com -b"
             else
-            if [ ! -f /usr/bin/brush ]; then
-            echo "[*] Brush Not Found! Installing now."
-            git clone https://github.com/stryngs/cpc.git
-            echo "[*] Moving to /usr/bin"
-            mv cpc/brush /usr/bin
-            echo "[*] Installing PythonWhoIs"
-            pip install pythonwhois
-            echo "[*] Installing IPWhoIs"
-            pip install ipwhois
-            echo "[*] Cleaning up"
-            rm -R cpc
-            echo "[*] Installed!  Running Scan Now!"
-            brush -n $1
-            wait
-            echo "[*] Check clients.sqlite file for results. Reccinebded SQLite Browser"
-            else
-            echo "[*] Running Brush"
-            brush -n $1
-            wait
-            echo "[*] Check clients.sqlite file for results. Reccomended SQLite Browser"
+                 if [ ! -f /usr/bin/brush ]; then
+                      echo "[*] Brush Not Found! Installing now."
+                      git clone https://github.com/stryngs/cpc.git
+                      echo "[*] Moving to /usr/bin"
+                      mv cpc/brush /usr/bin
+                      echo "[*] Installing PythonWhoIs"
+                      pip install pythonwhois
+                      echo "[*] Installing IPWhoIs"
+                      pip install ipwhois
+                      echo "[*] Cleaning up"
+                      rm -R cpc
+                      echo "[*] Installed!  Running Scan Now!"
+                      brush -n $1
+                      wait
+                      echo "[*] Check clients.sqlite file for results. Reccinebded SQLite Browser"
+                      else
+                      echo "[*] Running Brush"
+                      brush -n $1
+                      wait
+                 echo "[*] Check clients.sqlite file for results. Reccomended SQLite Browser"
             fi
             fi 
+            exit 0;;
+        --update) echo "[*] wenum Version $VERSION"
+            echo "[*] Updating wenum"
+            if [ "$1" != "--update" ]; then
+                 echo "[*] Error!  Must be used as wenum --update"
+            else
+                 git=$(curl --silent https://github.com/barthyala/waldo-enumeration/blob/master/wenum | grep 'VERSION=' | cut -d">" -f2 | cut -d"<" -f1 | cut -d"=" -f 2)
+                 echo "$git Git Version"
+                 echo "$VERSION Installed Version"
+                 ABSOLUTE_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")
+                 #Uncomment below for debugging
+                 #echo "$ABSOLUTE_PATH"
+                 if [ "$git" == "$VERSION" ]; then
+                      echo "[*] Installed Version is latest"
+                 else
+                      echo "[*] Needs an update!"
+                      git clone https://github.com/barthyala/waldo-enumeration
+                      echo "[*] Installing to $ABSOLUTE_PATH"
+                      mv waldo-enumeration/wenum $ABSOLUTE_PATH
+                      echo "[*] Cleaning up"
+                      wait
+                      rm -R waldo-enumeration
+                 fi
+            fi
+            exit 0;;
+        --version) echo "[*] Version $VERSION"
             exit 0;;
         -*) echo "[*] Nmap Full Vuln Scan"
             echo "[*] Usage: wenum <target> -options"
