@@ -13,21 +13,22 @@ echo "-hv                           Run all HTTP Vuln NSE's against target"
 echo "-s                            Run the Full Powerhouse Suite"
 echo "-cs                           Run NSE Script against Target"
 echo "-b                            Run Brush Script against Target"
-#install digem
-#add update capabilities
-#add manual zonefile transfer capabilities
 echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
 echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"
+echo "-z                            Run a zonefile transfer against a target domain"
+echo "--update                      Updates wenum"
 exit 0
 fi
 
-VERSION=1.0.1
+VERSION=1.0.2
 #store our final octet for final naming into $host
 if [[ $1 == *[/]* ]]; then
-hostl=$(echo $1 | cut -d"." -f4 | cut -d"/" -f2)
-host="sub$hostl"
+     hostl=$(echo $1 | cut -d"." -f4 | cut -d"/" -f2)
+     host="sub$hostl"
+elif echo "$1" | grep '[0-9]' >/dev/null; then
+     host=$(echo $1 | cut -d"." -f4)
 else
-host=$(echo $1 | cut -d"." -f4)
+     host=$1
 fi
 
 #Here we set up our options and arguments
@@ -44,7 +45,9 @@ for arg; do
             echo "-cs                           Run NSE Script against Target"
             echo "-b                            Run Brush Script against Target"
             echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
-            echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"                
+            echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>" 
+            echo "-z                            Run a zonefile transfer against a target domain"
+            echo "--update                      Updates wenum"               
             exit 0 ;;
         -l) echo "[*] Search for NSE Vuln Scripts, Options include http, ftp, afp, smb, smtp, samba, rmi, rdp, and mysql"
             echo "[!] leave empty for all"
@@ -64,7 +67,8 @@ for arg; do
             echo "[*] RUNNING THE POWERHOUSE!"
             if [ "$1" == "-s" ]; then
                  echo "[*] Error! Must be used with a target or range."
-                 echo "[*] Ex: wenum 192.168.25.142 -s"
+                 echo "[*] Ex: wenum 192.168.25.142-146 -s"
+                 exit 0
             else
                  nmap -p0-65535 -A $1 > ~/Desktop/$host-enum/nmap.txt &
                  wait
@@ -183,6 +187,22 @@ for arg; do
             fi
             fi 
             exit 0;;
+        -z) echo "[*] Running Zonefile Transfer"
+            if [ "$1" == "-z" ]; then
+                 echo "[*] Error! Must be used with a target."
+                 echo "[*] Ex: wenum google.com -z"
+                 exit 0
+            else
+                 if [ ! -d ~/Desktop/$host-enum ]; then
+                      mkdir ~/Desktop/$host-enum
+                 fi
+                 for line in $(host -t ns $1| cut -d" " -f4); do
+                      host -l $1 $line | grep "has address" > ~/Desktop/$host-enum/ztransfer.txt &
+                      wait
+                      cat ~/Desktop/$host-enum/ztransfer.txt
+                 done
+            fi
+            exit 0;;
         --update) echo "[*] wenum Version $VERSION"
             echo "[*] Updating wenum"
             if [ "$1" != "--update" ]; then
@@ -221,6 +241,8 @@ for arg; do
             echo "-b                            Run Brush Script against Target"
             echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
             echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"  
+            echo "-z                            Run a zonefile transfer against a target domain"
+            echo "--update                      Updates wenum"
             exit 0;;
         *)  dir=$arg ;; #This line is required to pass the target when given.  Gives anything given as an argument without a slash and passes it through to be used for the program.
     esac
