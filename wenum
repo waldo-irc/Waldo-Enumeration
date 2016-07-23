@@ -13,6 +13,9 @@ echo "-hv                           Run all HTTP Vuln NSE's against target"
 echo "-s                            Run the Full Powerhouse Suite"
 echo "-cs                           Run NSE Script against Target"
 echo "-b                            Run Brush Script against Target"
+#install digem
+#add update capabilities
+#add manual zonefile transfer capabilities
 echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
 echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"
 exit 0
