@@ -29,3 +29,16 @@ options:
 -z                            Run a zonefile transfer against a target domain
 <br />
 --update                      Updates wenum
+
+#Usage Examples
+wenum is a script made to quickly fully enumerate a server.  
+
+wenum 192.168.1.1 -s
+
+This command runs the full powerhouse.  It does a full nmap port scan with banner grabbing and the works, if ports 80 or 443 are detected it lets you further nikto and dirbuster them, if ports 139 or 445 are open it alerts you so you can use wsmb or another program to poke around SMB.  
+
+wenum google.com -z
+
+This runs a quick zonefile transfer against all nameservers of the target.
+
+All output is saved to a folder with the hostname/(last 2 digits of IP)-enum.
