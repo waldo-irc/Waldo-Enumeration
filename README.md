@@ -1,8 +1,8 @@
 #Waldo Enumeration - Current Version 1.0.2
 
-[*] Nmap Full Vuln Scan
+Nmap Full Vuln Scan
 <br />
-[*] Usage: wenum <target> [options]
+Usage: wenum <target> [options]
 <br />
 options:
 <br />
