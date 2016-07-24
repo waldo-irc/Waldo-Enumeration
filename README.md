@@ -1,4 +1,5 @@
-#Waldo Enumeration - Current
+#Waldo Enumeration - Current Version 1.0.2
+
 echo "[*] Nmap Full Vuln Scan"
 echo "[*] Usage: wenum <target> [options]"
 echo "options:"
