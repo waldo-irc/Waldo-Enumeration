@@ -20,16 +20,31 @@ echo "--update                      Updates wenum"
 exit 0
 fi
 
-ABSOLUTE_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")
-VERSION=1.0.2
+#update Locate DB
+updatedb
 
-if grep -q "WUPDATE=1" ~/.bashrc; then
+#setting global variables
+ABSOLUTE_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")
+VERSION=1.0.3
+
+#checks for updates and notifies if available
+git=$(curl --silent https://github.com/barthyala/waldo-enumeration/blob/master/wenum | grep 'VERSION=' | cut -d">" -f2 | cut -d"<" -f1 | cut -d"=" -f 2)
+if [ "$git" == "$VERSION" ]; then
      :
-else
-     echo "[*] Updating Database"
-     updatedb     
-     echo "WUPDATE=1" >> ~/.bashrc
+elif [ "$1" != "--update" ]; then
+     echo "[****] Update Available"
+     echo "[****] Version update from $VERSION to $git"
+     echo "[****] Read Changelog for more info. https://github.com/barthyala/SMBScan/blob/master/README.md"
 fi
+
+#checks for first time run in order to update Locate DB
+#if grep -q "WUPDATE=1" ~/.bashrc; then
+#     :
+#else
+#     echo "[*] Updating Database"
+#     updatedb     
+#     echo "WUPDATE=1" >> ~/.bashrc
+#fi
 
 #store our final octet for final naming into $host
 if [[ $1 == *[/]* ]]; then
@@ -90,6 +105,8 @@ for arg; do
                  fi
                  if grep -q '\b80/tcp\b' ~/Desktop/$host-enum/nmap.txt; then
                       echo "[*] HTTP Port Open"
+                      HTTPBAN=$(nmap -p80 -sV 10.11.1.8 | grep 80/tcp | cut -d" " -f6,7,8,9,10,11)
+                      echo "[*] HTTP Version $HTTPBAN"
                       read -p "<HTTP Open - Run Nikto?> : y/N: " CONDITION;
                       if [ "$CONDITION" == "y" ]; then
                            echo "[*] Running Nikto"
@@ -101,9 +118,10 @@ for arg; do
                            dirb http://$1
                       fi
                  fi
-                 if grep -q '\b443/tcp\b' ~/Desktop/$host-enum/nmap.txt
-                 then
+                 if grep -q '\b443/tcp\b' ~/Desktop/$host-enum/nmap.txt; then
                       echo "[*] HTTPS Port Open"
+                      HTTPSBAN=$(nmap -p443 -sV 10.11.1.8 | grep 443/tcp | cut -d" " -f6,7,8,9,10,11)
+                      echo "[*] HTTP Version $HTTPSBAN"
                       read -p "<HTTPS Open - Run Nikto?> : y/N: " CONDITION;
                       if [ "$CONDITION" == "y" ]; then
                            echo "[*] Running Nikto"
@@ -218,7 +236,6 @@ for arg; do
             if [ "$1" != "--update" ]; then
                  echo "[*] Error!  Must be used as wenum --update"
             else
-                 git=$(curl --silent https://github.com/barthyala/waldo-enumeration/blob/master/wenum | grep 'VERSION=' | cut -d">" -f2 | cut -d"<" -f1 | cut -d"=" -f 2)
                  echo "$git Git Version"
                  echo "$VERSION Installed Version"
                  #Uncomment below for debugging
@@ -256,5 +273,3 @@ for arg; do
         *)  dir=$arg ;; #This line is required to pass the target when given.  Gives anything given as an argument without a slash and passes it through to be used for the program.
     esac
 done
-
-echo "[*] Argument Required"
