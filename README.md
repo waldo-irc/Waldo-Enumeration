@@ -42,3 +42,11 @@ wenum google.com -z
 This runs a quick zonefile transfer against all nameservers of the target.
 
 All output is saved to a folder with the hostname/(last 2 digits of IP)-enum.
+
+#Changelog
+*1.0.3
+<ul>
+<li> Added automatic update checking (updates are still executed manually though for convenience)</li>
+<li> Added Banner Grabbing for powerhouse to notify you if port 80 really is a Web server</li>
+<li> Locate database now updates properly.</li>
+</ul>
