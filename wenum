@@ -25,7 +25,7 @@ updatedb
 
 #setting global variables
 ABSOLUTE_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")
-VERSION=1.0.3
+VERSION=1.0.4
 
 #checks for updates and notifies if available
 git=$(curl --silent https://github.com/waldo-irc/waldo-enumeration/blob/master/wenum | grep 'VERSION=' | cut -d">" -f2 | cut -d"<" -f1 | cut -d"=" -f 2)
@@ -108,14 +108,18 @@ for arg; do
                       HTTPBAN=$(nmap -p80 -sV 10.11.1.8 | grep 80/tcp | cut -d" " -f6,7,8,9,10,11)
                       echo "[*] HTTP Version $HTTPBAN"
                       read -p "<HTTP Open - Run Nikto?> : y/N: " CONDITION;
-                      if [ "$CONDITION" == "y" ]; then
+                      if [ "$CONDITION" == "y" ] || [ "$CONDITION" == "Y" ]; then
                            echo "[*] Running Nikto"
                            nikto -h $1 > ~/Desktop/$host-enum/nikto.txt &
                            wait
                       fi
                       read -p "<HTTP Open - Run Dirb?> : y/N: " CONDITION;
-                      if [ "$CONDITION" == "y" ]; then
+                      if [ "$CONDITION" == "y" ] || [ "$CONDITION" == "Y" ]; then
                            dirb http://$1
+                      fi
+                      read -p "<Take a Screenshot of dirb (Takes SS of terminal, enlarge to capture whole terminal)?> : y/N: " CONDITION;
+                      if [ "$CONDITION" == "y" ] || [ "$CONDITION" == "Y" ]; then
+                           gnome-screenshot --window -f ~/Desktop/$host-enum/httpdirb.jpg
                       fi
                  fi
                  if grep -q '\b443/tcp\b' ~/Desktop/$host-enum/nmap.txt; then
@@ -123,14 +127,37 @@ for arg; do
                       HTTPSBAN=$(nmap -p443 -sV 10.11.1.8 | grep 443/tcp | cut -d" " -f6,7,8,9,10,11)
                       echo "[*] HTTP Version $HTTPSBAN"
                       read -p "<HTTPS Open - Run Nikto?> : y/N: " CONDITION;
-                      if [ "$CONDITION" == "y" ]; then
+                      if [ "$CONDITION" == "y" ] || [ "$CONDITION" == "Y" ]; then
                            echo "[*] Running Nikto"
                            nikto -h https://$1 > ~/Desktop/$host-enum/niktossl.txt &
                            wait
                       fi
                       read -p "<HTTPS Open - Run Dirb?> : y/N: " CONDITION;
-                      if [ "$CONDITION" == "y" ]; then
+                      if [ "$CONDITION" == "y" ] || [ "$CONDITION" == "Y" ]; then
                            dirb https://$1
+                      fi
+                      read -p "<Take a Screenshot of dirb (Takes SS of terminal, enlarge to capture whole terminal)?> : y/N: " CONDITION;
+                      if [ "$CONDITION" == "y" ] || [ "$CONDITION" == "Y" ]; then
+                           gnome-screenshot --window -f ~/Desktop/$host-enum/httpsdirb.jpg
+                      fi
+                 fi
+                 if grep -q '\b8080/tcp\b' ~/Desktop/$host-enum/nmap.txt; then
+                      echo "[*] HTTP Proxy Port Open"
+                      HTTPSBAN=$(nmap -p8080 -sV 10.11.1.8 | grep 8080/tcp | cut -d" " -f6,7,8,9,10,11)
+                      echo "[*] Proxy Version $HTTPSBAN"
+                      read -p "<HTTP Proxy Open - Run Nikto on proxy?> : y/N: " CONDITION;
+                      if [ "$CONDITION" == "y" ] || [ "$CONDITION" == "Y" ]; then
+                           echo "[*] Running Nikto"
+                           nikto -h http://$1 -useproxy http://$1:8080 > ~/Desktop/$host-enum/niktoproxy.txt &
+                           wait
+                      fi
+                      read -p "<HTTP Proxy Open - Run Dirb?> : y/N: " CONDITION;
+                      if [ "$CONDITION" == "y" ] || [ "$CONDITION" == "Y" ]; then
+                           dirb http://$1 -p http://$1:8080
+                      fi
+                      read -p "<Take a Screenshot of dirb (Takes SS of terminal, enlarge to capture whole terminal)?> : y/N: " CONDITION;
+                      if [ "$CONDITION" == "y" ] || [ "$CONDITION" == "Y" ]; then
+                           gnome-screenshot --window -f ~/Desktop/$host-enum/proxydirb.jpg
                       fi
                  fi
             fi
