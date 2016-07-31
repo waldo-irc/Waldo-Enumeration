@@ -46,6 +46,12 @@ This runs a quick zonefile transfer against all nameservers of the target.
 All output is saved to a folder with the hostname/(last 2 digits of IP)-enum.
 
 #Changelog
+*1.0.4
+<ul>
+<li> Add HTTP Proxy detection and Scanning.</li>
+<li> Added ability to take SS of terminal for documentation</li>
+</ul>
+
 *1.0.3
 <ul>
 <li> Added automatic update checking (updates are still executed manually though for convenience)</li>
