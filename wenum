@@ -76,7 +76,7 @@ fi
 
 #setting global variables
 ABSOLUTE_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")
-VERSION=1.0.5
+VERSION=1.0.51
 
 # Use `$echoLog` everywhere you print verbose logging messages to console
 # By default, it is disabled and will be enabled with the `-v` or `--verbose` flags
@@ -98,10 +98,10 @@ updatedb
 
 #checks for updates and notifies if available
 $echoLog "[+verbose] Checking github for version updates." 
-git=$(curl --silent https://github.com/waldo-irc/waldo-enumeration/blob/master/wenum | grep 'VERSION=' | cut -d">" -f2 | cut -d"<" -f1 | cut -d"=" -f 2)
+git=$(curl --silent https://github.com/waldo-irc/waldo-enumeration/blob/master/wenum | grep 'VERSION=' | cut -d">" -f10 | cut -d"<" -f1 | cut -d"=" -f 2)
 if [ "$git" == "$VERSION" ]; then
      :
-elif [ "$1" != "--update" ]; then
+else
      echo "[****] Update Available"
      echo "[****] Version update from $VERSION to $git"
      echo "[****] Read Changelog for more info. https://github.com/waldo-irc/SMBScan/blob/master/README.md"
