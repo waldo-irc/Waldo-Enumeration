@@ -1,6 +1,59 @@
 #!/bin/bash
 #Nmap Full Vuln Scan
 
+Rand=$(( ( RANDOM % 3 )  + 1 ))
+if [ "$Rand" == "1" ]; then
+cat << "EndOfMessage"
+'##:::::'##:'########:'##::: ##:'##::::'##:'##::::'##:
+ ##:'##: ##: ##.....:: ###:: ##: ##:::: ##: ###::'###:
+ ##: ##: ##: ##::::::: ####: ##: ##:::: ##: ####'####:
+ ##: ##: ##: ######::: ## ## ##: ##:::: ##: ## ### ##:
+ ##: ##: ##: ##...:::: ##. ####: ##:::: ##: ##. #: ##:
+ ##: ##: ##: ##::::::: ##:. ###: ##:::: ##: ##:.:: ##:
+. ###. ###:: ########: ##::. ##:. #######:: ##:::: ##:
+:...::...:::........::..::::..:::.......:::..:::::..::   
+
+[*] Running wenum!                                                                                                      
+EndOfMessage
+elif [ "$Rand" == "2" ]; then
+cat << "EndOfMessage"
+ __      __            ___        __             
+/\ \  __/\ \          /\_ \      /\ \            
+\ \ \/\ \ \ \     __  \//\ \     \_\ \     ___   
+ \ \ \ \ \ \ \  /'__`\  \ \ \    /'_` \   / __`\ 
+  \ \ \_/ \_\ \/\ \L\.\_ \_\ \_ /\ \L\ \ /\ \L\ \
+   \ `\___x___/\ \__/.\_\/\____\\ \___,_\\ \____/
+    '\/__//__/  \/__/\/_/\/____/ \/__,_ / \/___/ 
+ ____                                            
+/\  _`\                                          
+\ \ \L\_\    ___    __  __    ___ ___            
+ \ \  _\L  /' _ `\ /\ \/\ \ /' __` __`\          
+  \ \ \L\ \/\ \/\ \\ \ \_\ \/\ \/\ \/\ \         
+   \ \____/\ \_\ \_\\ \____/\ \_\ \_\ \_\        
+    \/___/  \/_/\/_/ \/___/  \/_/\/_/\/_/     
+   
+                                                 
+[*] Running wenum!                                                       
+EndOfMessage
+elif [ "$Rand" == "3" ]; then
+cat << "EndOfMessage"
+  __      __          _        _           
+  \ \    / /__ _     | |    __| |    ___   
+   \ \/\/ // _` |    | |   / _` |   / _ \  
+    \_/\_/ \__,_|   _|_|_  \__,_|   \___/  
+  _|"""""|_|"""""|_|"""""|_|"""""|_|"""""|
+  "`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-' 
+     ___                                   
+    | __|   _ _     _  _    _ __           
+    | _|   | ' \   | +| |  | '  \          
+    |___|  |_||_|   \_,_|  |_|_|_|         
+  _|"""""|_|"""""|_|"""""|_|"""""|         
+  "`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'   
+
+[*] Running wenum!       
+EndOfMessage
+fi
+
 #First part checks to make sure we have a host or any variable given.  If not, help options are displayed
 if [ -z "$1" ]; then
 echo "[*] Nmap Full Vuln Scan"
@@ -16,18 +69,35 @@ echo "-b                            Run Brush Script against Target"
 echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
 echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"
 echo "-z                            Run a zonefile transfer against a target domain"
+echo "-v                            Verbose output"
 echo "--update                      Updates wenum"
 exit 0
 fi
 
-#update Locate DB
-updatedb
-
 #setting global variables
 ABSOLUTE_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")
-VERSION=1.0.4
+VERSION=1.0.5
+
+# Use `$echoLog` everywhere you print verbose logging messages to console
+# By default, it is disabled and will be enabled with the `-v` or `--verbose` flags
+declare echoLog='silentEcho'
+function silentEcho() {
+    :
+}
+
+#start verbose, this way it runs as first argument.
+for arg; do
+    case $arg in
+      -v) echoLog='echo'; ;;
+    esac
+done
+
+#update Locate DB
+$echoLog "[+verbose] Running updatedb."
+updatedb
 
 #checks for updates and notifies if available
+$echoLog "[+verbose] Checking github for version updates." 
 git=$(curl --silent https://github.com/waldo-irc/waldo-enumeration/blob/master/wenum | grep 'VERSION=' | cut -d">" -f2 | cut -d"<" -f1 | cut -d"=" -f 2)
 if [ "$git" == "$VERSION" ]; then
      :
@@ -37,16 +107,8 @@ elif [ "$1" != "--update" ]; then
      echo "[****] Read Changelog for more info. https://github.com/waldo-irc/SMBScan/blob/master/README.md"
 fi
 
-#checks for first time run in order to update Locate DB
-#if grep -q "WUPDATE=1" ~/.bashrc; then
-#     :
-#else
-#     echo "[*] Updating Database"
-#     updatedb     
-#     echo "WUPDATE=1" >> ~/.bashrc
-#fi
-
 #store our final octet for final naming into $host
+$echoLog "[+verbose] Grepping Host for foldername creation."
 if [[ $1 == *[/]* ]]; then
      hostl=$(echo $1 | cut -d"." -f4 | cut -d"/" -f2)
      host="sub$hostl"
@@ -59,21 +121,8 @@ fi
 #Here we set up our options and arguments
 for arg; do
     case $arg in
-        -h) echo "[*] Nmap Full Vuln Scan"
-            echo "[*] Usage: wenum <target> -options"
-            echo "options:"
-            echo "-h, --help                    show brief help"
-            echo "-l                            Search for NSE Vuln Scripts"
-            echo "-la                           Search through all NSE Scripts"
-            echo "-hv                           Run all HTTP Vuln NSE's against target"
-            echo "-s                            Run the Full Powerhouse Suite"
-            echo "-cs                           Run NSE Script against Target"
-            echo "-b                            Run Brush Script against Target"
-            echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
-            echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>" 
-            echo "-z                            Run a zonefile transfer against a target domain"
-            echo "--update                      Updates wenum"               
-            exit 0 ;;
+        -v) echo "[/*\]"
+            $echoLog "[+verbose] Running in Verbose Mode" ;;
         -l) echo "[*] Search for NSE Vuln Scripts, Options include http, ftp, afp, smb, smtp, samba, rmi, rdp, and mysql"
             echo "[!] leave empty for all"
             read -p "<Which Script?> :`echo $'\n> '`" TYPE;
@@ -121,6 +170,21 @@ for arg; do
                       if [ "$CONDITION" == "y" ] || [ "$CONDITION" == "Y" ]; then
                            gnome-screenshot --window -f ~/Desktop/$host-enum/httpdirb.jpg
                       fi
+                      read -p "<Run HTTP NSE Scripts?> : y/N: " CONDITION;
+                      if [ "$CONDITION" == "y" ] || [ "$CONDITION" == "Y" ]; then
+                           if [ ! -d ~/Desktop/$host-enum/NSE ] || [ ! -d ~/Desktop/$host-enum ]; then
+                                mkdir ~/Desktop/$host-enum
+                                mkdir ~/Desktop/$host-enum/NSE
+                           fi 
+                           for a in $(locate nmap/scripts/http | cut -d"/" -f6 | grep "vuln" | cut -d"." -f1 | sort -r ); do
+                                nmap -p80 -script $a $1 --open > ~/Desktop/$host-enum/NSE/$a.txt
+                                wait
+                                echo "[*] Running $a"
+                                if grep -q "VULNERABLE" ~/Desktop/$host-enum/NSE/$a.txt; then
+                                     echo "[!!] $1 Seems Vulnerable to $a!"
+                                fi
+                           done 
+                      fi
                  fi
                  if grep -q '\b443/tcp\b' ~/Desktop/$host-enum/nmap.txt; then
                       echo "[*] HTTPS Port Open"
@@ -164,7 +228,8 @@ for arg; do
             echo "[*] End"
             leafpad ~/Desktop/$host-enum/nmap.txt
             exit 0;;
-        -stryngs) curl -X OPTIONS $1 -v
+        -stryngs) $echoLog "[+verbose] Running Curl -X Options on target"  
+            curl -X OPTIONS $1 -v
             exit 0 ;;
         -stryngsx) read -p "<Enter file to PUT RCE>: " CONDITION;
             read -p "<Enter port to use>: " PORT;
@@ -191,7 +256,7 @@ for arg; do
                  echo "[*] Ex: wenum 192.168.25.0/24 -hv"
                  exit 0
             fi 
-            if [ ! -d ~/Desktop/$host-enum/NSE ]; then
+            if [ ! -d ~/Desktop/$host-enum/NSE ] || [ ! -d ~/Desktop/$host-enum ]; then
                  mkdir ~/Desktop/$host-enum
                  mkdir ~/Desktop/$host-enum/NSE
             fi 
@@ -251,7 +316,9 @@ for arg; do
                  if [ ! -d ~/Desktop/$host-enum ]; then
                       mkdir ~/Desktop/$host-enum
                  fi
+                 $echoLog "[+verbose] Grabbing Nameservers" 
                  for line in $(host -t ns $1| cut -d" " -f4); do
+                      $echoLog "[+verbose] Attempting Transfer" 
                       host -l $1 $line | grep "has address" > ~/Desktop/$host-enum/ztransfer.txt &
                       wait
                       cat ~/Desktop/$host-enum/ztransfer.txt
@@ -295,6 +362,7 @@ for arg; do
             echo "-stryngs                      Run the stryngs Verb Tampering Special :D"
             echo "-stryngsx                     Run the Verb Tamper with PUT RCE <TARGET>"  
             echo "-z                            Run a zonefile transfer against a target domain"
+            echo "-v                            Verbose output"
             echo "--update                      Updates wenum"
             exit 0;;
         *)  dir=$arg ;; #This line is required to pass the target when given.  Gives anything given as an argument without a slash and passes it through to be used for the program.

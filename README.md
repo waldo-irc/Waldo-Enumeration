@@ -1,4 +1,4 @@
-#Waldo Enumeration - Current Version 1.0.4
+#Waldo Enumeration - Current Version 1.0.5
 
 This script is another work in progress with updates to come.  I got frustrated of opening several terminals or tmux windows and running several scans at once and decided to automate it.  Starts with an Nmap, based on open ports it will suggest what to do next.  If SMB is detected, SMBScan is recommended for further scanning.  Also runs vuln NSE scripts for HTTP and does zonefile transfers and gathers information about a domain using "brush".
 
@@ -46,6 +46,14 @@ This runs a quick zonefile transfer against all nameservers of the target.
 All output is saved to a folder with the hostname/(last 2 digits of IP)-enum.
 
 #Changelog
+*1.0.5
+<ul>
+<li> Minor Bug Fixes</li>
+<li> HTTP Scan now also offers NSE Script runs</li>
+<li> ASCII Art Intro added</li>
+<li> Verbosity added.  Plans to lesson output to allow for verbosity to do the work.</li>
+</ul>
+
 *1.0.4
 <ul>
 <li> Added HTTP Proxy detection and Scanning.</li>
