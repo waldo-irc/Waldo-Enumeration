@@ -1,5 +1,12 @@
 #Waldo Enumeration - Current Version 1.0.51
-
+<pre>
+ __      __        .__       .___       ___________                     
+/  \    /  \_____  |  |    __| _/____   \_   _____/ ____  __ __  _____  
+\   \/\/   /\__  \ |  |   / __ |/  _ \   |    __)_ /    \|  |  \/     \ 
+ \        /  / __ \|  |__/ /_/ (  <_> )  |        \   |  \  |  /  Y Y  \
+  \__/\  /  (____  /____/\____ |\____/  /_______  /___|  /____/|__|_|  /
+       \/        \/           \/                \/     \/            \/ 
+</pre>
 This script is another work in progress with updates to come.  I got frustrated of opening several terminals or tmux windows and running several scans at once and decided to automate it.  Starts with an Nmap, based on open ports it will suggest what to do next.  If SMB is detected, SMBScan is recommended for further scanning.  Also runs vuln NSE scripts for HTTP and does zonefile transfers and gathers information about a domain using "brush".
 
 Please use responsibly and with permission only.  I do not condone unauthorized uses and will not be responsible for anything unethical commited with these.
