@@ -344,6 +344,7 @@ for arg; do
                       echo "[*] Cleaning up"
                       wait
                       rm -R waldo-enumeration
+                      echo "[*] Installed Version updated to $git"
                  fi
             fi
             exit 0;;
